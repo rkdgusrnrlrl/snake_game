@@ -12,16 +12,14 @@
             //객체 리터럴
             var snakeGame = {};
 
-
-
-           
-
 			snakeGame = (function () {
                 var BODY_SIZE = 5;
                 var MAX_WIDTH = 600;
                 var MAX_HEIGHT = 600;
 
-                var FRAME_LENGTH = 200; //new frame every 0.5 seconds
+                var MAX_TAIL = 10;
+
+                var FRAME_LENGTH = 100; //new frame every 0.5 seconds
 
                 var UP = {x: 0, y : -BODY_SIZE};
                 var DOWN = {x: 0, y : BODY_SIZE};
@@ -41,7 +39,8 @@
 
                 var extraTail = 0;
 
-                function  coordinates (x,y) {
+
+                function square (x,y) {
                     return {
                         x : x || 0,
                         y : y || 0,
@@ -91,7 +90,7 @@
                    var x = 0,
                        y = 0;
                    for (var i = 0; i < 5 ; i ++) {
-                       snak.push(coordinates(x,y));
+                       snak.push(square(x,y));
                        x += 5;
                    }
                 }
@@ -100,7 +99,7 @@
                     while (true) {
                         var foodX = Math.floor(Math.random() * MAX_WIDTH);
                         var foodY = Math.floor(Math.random() * MAX_HEIGHT);
-                        var newFood =  coordinates(foodX, foodY);
+                        var newFood =  square(foodX, foodY);
                         if (foods.indexOf(newFood) < 0) {
                             foods.push(newFood);
                             if (foods.length > BODY_SIZE) break;
@@ -134,7 +133,14 @@
 					gameLoop();
 				}
 
-				function  gameLoop() {
+                var isWin = function () {
+                    if (snak.length > MAX_TAIL) {
+                        return true
+                    }
+                    return false;
+                };
+
+                function  gameLoop() {
                     if (extraTail > 0) {
                         extraTail -= 1;
                     } else {
@@ -143,7 +149,12 @@
 
                     var newHead = putNewHead(snak);
                     checkCrush();
-                    if (isDead) return;
+                    if (isDead) {
+                        return;
+                    }else if (isWin()) {
+                        alert("승리하였습니다.");
+                        return;
+                    }
 
                     drawSnak(newHead);
                     setTimeout(gameLoop, FRAME_LENGTH); //do it all again
@@ -185,7 +196,7 @@
 
                 function putNewHead(snak) {
                     var prevHead = snak[lastIdx()];
-                    var newHead = coordinates(prevHead.x + direction.x
+                    var newHead = square(prevHead.x + direction.x
                                             ,prevHead.y + direction.y);
                     snak.push(newHead);
                     return newHead;
