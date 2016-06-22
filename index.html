@@ -1,0 +1,250 @@
+<html>
+        <head>
+            <meta charset="utf8">
+            <script
+			  src="https://code.jquery.com/jquery-2.2.4.min.js"
+			  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+			  crossorigin="anonymous"></script>
+        </head>
+
+        <body>
+            <script type="text/javascript">
+            //객체 리터럴
+            var snakeGame = {};
+
+
+
+           
+
+			snakeGame = (function () {
+                var BODY_SIZE = 5;
+                var MAX_WIDTH = 600;
+                var MAX_HEIGHT = 600;
+
+                var FRAME_LENGTH = 200; //new frame every 0.5 seconds
+
+                var UP = {x: 0, y : -BODY_SIZE};
+                var DOWN = {x: 0, y : BODY_SIZE};
+                var RIGHT = {y: 0, x : BODY_SIZE};
+                var LIFT = {y: 0, x : -BODY_SIZE};
+
+                var DIRECTION_ARRAY = [DOWN, RIGHT, UP, LIFT];
+
+                var ctx;
+                var xPosition = 0;
+                var yPosition = 0;
+                var direction = RIGHT;
+				var isDead = false;
+
+				var snak = [];
+                var foods = [];
+
+                var extraTail = 0;
+
+                function  coordinates (x,y) {
+                    return {
+                        x : x || 0,
+                        y : y || 0,
+                        isIn : function (other) {
+                            //위로 갈때
+                            if (((other.x <= this.x && this.x <= other.x + BODY_SIZE))
+                                    || (other.x <= this.x+BODY_SIZE && this.x+BODY_SIZE <= other.x +BODY_SIZE)){
+                                if (other.y <= this.y && this.y <= other.y+BODY_SIZE) {
+                                    return true;
+                                }
+                            }
+                            //아래로 갈때
+                            if ((other.x <= this.x && this.x <= other.x + BODY_SIZE)
+                                    || (other.x <= this.x+BODY_SIZE && this.x+BODY_SIZE <= other.x +BODY_SIZE)){
+                                if (other.y <= this.y +BODY_SIZE && this.y+BODY_SIZE <= other.y+BODY_SIZE) {
+                                    return true;
+                                }
+                            }
+
+                            //오른쪽로 갈때
+                            if ((other.y <= this.y && this.y <= other.y + BODY_SIZE)
+                                    || (other.y <= this.y+BODY_SIZE && this.y+BODY_SIZE <= other.y +BODY_SIZE)){
+                                if (other.x <= this.x +BODY_SIZE && this.x+BODY_SIZE <= other.x+BODY_SIZE) {
+                                    return true;
+                                }
+                            }
+
+                            //왼쪽로 갈때
+                            if ((other.y <= this.y && this.y <= other.y + BODY_SIZE)
+                                    || (other.y <= this.y+BODY_SIZE && this.y+BODY_SIZE <= other.y +BODY_SIZE)){
+                                if (other.x <= this.x && this.x <= other.x+BODY_SIZE) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }
+                    }
+                }
+
+				function lastIdx() {
+					return snak.length-1;
+				}
+
+
+
+                function snakeInit() {
+                   var x = 0,
+                       y = 0;
+                   for (var i = 0; i < 5 ; i ++) {
+                       snak.push(coordinates(x,y));
+                       x += 5;
+                   }
+                }
+
+                function foodInit() {
+                    while (true) {
+                        var foodX = Math.floor(Math.random() * MAX_WIDTH);
+                        var foodY = Math.floor(Math.random() * MAX_HEIGHT);
+                        var newFood =  coordinates(foodX, foodY);
+                        if (foods.indexOf(newFood) < 0) {
+                            foods.push(newFood);
+                            if (foods.length > BODY_SIZE) break;
+                        }
+                    }
+                }
+
+                /**
+					컨버스를 만들고 context 를 현재 객체의 ctx 에 넘겨줌
+				*/
+				function init() {
+					$('body').append('<canvas id="jsSnake">');
+					var $canvas = $('#jsSnake');
+					$canvas.attr('width', MAX_WIDTH);
+					$canvas.attr('height', MAX_HEIGHT);
+					var canvas = $canvas[0];
+					ctx = canvas.getContext('2d');
+
+                    snakeInit();
+
+					for (var i = 0; i < snak.length; i++) {
+						drawSnak(snak[i]);
+					}
+
+                    foodInit();
+
+                    for (var j = 0; j < foods.length; j++) {
+                        drawSnak(foods[j]);
+                    }
+
+					gameLoop();
+				}
+
+				function  gameLoop() {
+                    if (extraTail > 0) {
+                        extraTail -= 1;
+                    } else {
+                        clearTail(snak);
+                    }
+
+                    var newHead = putNewHead(snak);
+                    checkCrush();
+                    if (isDead) return;
+
+                    drawSnak(newHead);
+                    setTimeout(gameLoop, FRAME_LENGTH); //do it all again
+				}
+
+				function drawSnak(snakBody){
+					ctx.fillStyle = '#fe57a1';
+					ctx.fillRect(snakBody.x, snakBody.y, BODY_SIZE, BODY_SIZE); //a moving rect
+				}
+
+                function isCrushWall(x, y) {
+                    if (x < 0 || x > MAX_WIDTH
+                            || y < 0 || y > MAX_HEIGHT) {
+                        return true;
+                    }
+                    return false;
+                }
+
+                function checkCrush() {
+                    var head = snak[lastIdx()];
+                    var x = head.x,
+                        y = head.y;
+
+                    if(isCrushWall(x, y)) {
+                        isDead = true;
+                    }
+
+                    for (var i = 0; i < foods.length; i++) {
+                        if (isCrush(head, foods[i])) {
+                            extraTail += 1;
+                            clearFood(foods[i]);
+                        }
+                    }
+                }
+
+                function isCrush(some, other) {
+                   return some.isIn(other);
+                }
+
+                function putNewHead(snak) {
+                    var prevHead = snak[lastIdx()];
+                    var newHead = coordinates(prevHead.x + direction.x
+                                            ,prevHead.y + direction.y);
+                    snak.push(newHead);
+                    return newHead;
+                }
+
+				function clearTail(snak){
+					var tail = snak.splice(0,1)[0];
+					ctx.clearRect(tail.x, tail.y, BODY_SIZE, BODY_SIZE);
+				}
+
+				function clearFood(food){
+                    var idx = foods.indexOf(food);
+					foods.splice(idx,1);
+					ctx.clearRect(food.x, food.y, BODY_SIZE, BODY_SIZE);
+				}
+
+				function moveIndex(direct, len) {
+					var val = direct % len;
+					if (val <0 ) {
+						val = len + val;
+					}
+					return val;
+				}
+
+				function moveHead(key) {
+					console.log("방향키 입력 : "+key);
+					var way;
+					switch (key) {
+						case 39:
+							way = -1;
+							break;
+						case 37:
+							way = 1;
+							break;
+						default:
+							return;
+					}
+					var idx = DIRECTION_ARRAY.indexOf(direction);
+					var newIdex = moveIndex(idx + way, DIRECTION_ARRAY.length);
+					
+					direction = DIRECTION_ARRAY[newIdex];
+					console.log("direction : "+ JSON.stringify(direction));
+				}
+
+				return {
+					init : init,
+					moveHead : moveHead
+				};
+			})();         
+
+			$(document).ready(function () {
+				snakeGame.init();
+
+				$("body").keydown(function( event ) {
+					snakeGame.moveHead(event.keyCode);
+        		});
+			});
+            </script>
+        </body>
+
+</html>
+
