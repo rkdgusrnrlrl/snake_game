@@ -7,8 +7,10 @@ var git = require('gulp-git');
 var path = require('path');
 
 gulp.task('pull', function(){
-    git.pull('origin', 'master', function (err) {
-        if (err) throw err;
+    git.pull('origin', 'master',{quiet: false},function (err) {
+        if (err) {
+            console.log(err.message);
+        }
     });
 });
 
