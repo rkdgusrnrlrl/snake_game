@@ -246,11 +246,25 @@
 			})();         
 
 			$(document).ready(function () {
+                var socket = io();
+
 				snakeGame.init();
 
+                $("#sub").click(function () {
+                    socket.emit('chat message', $('#m').val());
+                    $('#m').val('');
+                });
+
+                socket.on('msg', function(msg){
+                    console.log('lo');
+                    snakeGame.moveHead(drec);
+
+                });
+
 				$("body").keydown(function( event ) {
-					snakeGame.moveHead(event.keyCode);
+                    socket.emit('chat message', event.keyCode);
         		});
+
 			});
             </script>
         </body>
