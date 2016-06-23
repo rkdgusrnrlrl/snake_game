@@ -24,11 +24,17 @@
     <input id="m" autocomplete="off" /><button id="sub">Send</button>
     <script>
         var socket = io();
+
+
         $(function(){
             $("#sub").click(function () {
-                alert("hel");
                 socket.emit('chat message', $('#m').val());
                 $('#m').val('');
+            });
+
+            socket.on('chat message', function(msg){
+                console.log('lo');
+                $('#messages').append($('<li>').text(msg));
             });
         });
     </script>
