@@ -15,10 +15,13 @@ function snakeInit() {
     var x = 0,
         y = 0,
         snak = [];
+
     for (var i = 0; i < 5 ; i ++) {
         snak.push({x:x,y:y});
         x += 5;
     }
+
+    console.log("스네이크 데이너 init");
     return snak
 }
 
@@ -26,6 +29,7 @@ function snakeInit() {
 io.on('connection', function(socket){
     console.log('a user connected');
     io.emit('drawNewSnake', snakeInit());
+    console.log("스네이크 데이너 전송");
 
     socket.on('chat message', function(msg){
         console.log(msg);
