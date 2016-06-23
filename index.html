@@ -264,6 +264,7 @@
 
 				$("body").keydown(function( event ) {
                     socket.emit('chat message', event.keyCode);
+                    console.log("key 값 전송");
         		});
 
 			});
