@@ -257,8 +257,8 @@
                 });
 
                 socket.on('msg', function(msg){
-                    console.log('lo');
-                    snakeGame.moveHead(drec);
+                    console.log(msg);
+                    snakeGame.moveHead(msg);
 
                 });
 
