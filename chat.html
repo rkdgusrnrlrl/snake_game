@@ -32,7 +32,7 @@
                 $('#m').val('');
             });
 
-            socket.on('chat message', function(msg){
+            socket.on('msg', function(msg){
                 console.log('lo');
                 $('#messages').append($('<li>').text(msg));
             });
