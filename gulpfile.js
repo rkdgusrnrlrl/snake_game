@@ -5,9 +5,11 @@ var gulp = require('gulp');
 var nodemon = require('gulp-nodemon');
 var git = require('gulp-git');
 var path = require('path');
+var argv = require('yargs').argv;
 
 gulp.task('pull', function(){
-    git.pull('origin', 'master',{quiet: false},function (err) {
+    var branch = argv.b || "master";
+    git.pull('origin', branch.trim() ,{quiet: false},function (err) {
         if (err) {
             console.log(err.message);
         }
