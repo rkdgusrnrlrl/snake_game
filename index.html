@@ -240,9 +240,16 @@
 					console.log("direction : "+ JSON.stringify(direction));
 				}
 
+                function drawNewSnake(snake){
+                    for (var i = 0; i < snake.length; i++) {
+                        drawSnak(snake[i]);
+                    }
+                }
+
 				return {
 					init : init,
-					moveHead : moveHead
+					moveHead : moveHead,
+                    drawNewSnake : drawNewSnake
 				};
 			})();         
 
@@ -259,7 +266,11 @@
                 socket.on('msg', function(msg){
                     console.log(msg);
                     snakeGame.moveHead(msg);
+                });
 
+                socket.on('drawNewSnake', function(snake){
+                    console.log(snake);
+                    snakeGame.drawNewSnake(snake);
                 });
 
 				$("body").keydown(function( event ) {
