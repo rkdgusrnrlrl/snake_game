@@ -22,9 +22,6 @@ function snakeInit() {
     }
 
     console.log("스네이크 데이너 init");
-
-
-
     return snak
 }
 
