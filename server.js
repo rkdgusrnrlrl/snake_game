@@ -96,9 +96,12 @@ function square (sq) {
         }
     }
 }
+function lastIdx(snak) {
+    return snak.length-1;
+}
 
 function putNewHead(snak) {
-    var prevHead = snak[lastIdx()];
+    var prevHead = snak[lastIdx(snak)];
     var newHead = square(prevHead.x + direction.x
         ,prevHead.y + direction.y);
     snak.push(newHead);
