@@ -133,7 +133,7 @@ io.on('connection', function(socket){
     snakes[socket.id] = {snake : snake}
     socketList.push(socket.id);
 
-    io.emit('gameInit', {snake : snake, foods : foods});
+    socket.emit('gameInit', {snake : snake, foods : foods});
     console.log("스네이크 데이너 전송");
 
     socket.on('chat message', function(msg){
