@@ -118,6 +118,7 @@ function putNewHead(snak) {
 }
 
 var snakes = {};
+var socketList = [];
 
 function clearTail(snak){
     var tail = snak.splice(0,1)[0];
@@ -128,8 +129,9 @@ io.on('connection', function(socket){
     console.log('a user connected');
     var snake = snakeInit();
     var foods = foodInit();
-
+    console.log(socket.id)
     snakes[socket.id] = {snake : snake}
+    socketList.push(socket.id);
 
     io.emit('gameInit', {snake : snake, foods : foods});
     console.log("스네이크 데이너 전송");
@@ -143,9 +145,13 @@ io.on('connection', function(socket){
 
     } else {
         (function gameLoop () {
-            var head = putNewHead(snake);
-            var tail = clearTail(snake);
-            io.emit('gameLoop', { newHead: head, tail : tail });
+            //소켓 리스트에서 아이디를 꺼낸뒤 그 아이디로 해당 뱀을 꺼내줌
+            socketList.forEach(function (socketId){
+               var snake = snakes[socketId];
+               var head = putNewHead(snake);
+               var tail = clearTail(snake);
+               io.emit('gameLoop', { newHead: head, tail : tail });
+            });
             setTimeout(gameLoop, 500);
         })();
         isStart = true;
