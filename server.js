@@ -147,8 +147,8 @@ io.on('connection', function(socket){
         (function gameLoop () {
             //소켓 리스트에서 아이디를 꺼낸뒤 그 아이디로 해당 뱀을 꺼내줌
             socketList.forEach(function (socketId){
+                console.log(socketList);
                 var snake = snakes[socketId].snake;
-                console.log(snake);
                 var head = putNewHead(snake);
                 var tail = clearTail(snake);
                 io.emit('gameLoop', { newHead: head, tail : tail });
