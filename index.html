@@ -135,21 +135,23 @@
                     return false;
                 };
 
-                function  gameLoop() {
-                    if (extraTail > 0) {
+                function  gameLoop(head, tail) {
+                    /*if (extraTail > 0) {
                         extraTail -= 1;
                     } else {
                         clearTail(snak);
-                    }
+                    }*/
 
-                    var newHead = putNewHead(snak);
-                    checkCrush(newHead);
-                    if (isDead) {
+                    clearRect(tail);
+
+                    //var newHead = putNewHead(snak);
+                    checkCrush(head);
+                    /*if (isDead) {
                         return;
                     }else if (isWin()) {
                         alert("승리하였습니다.");
                         return;
-                    }
+                    }*/
 
                     drawSnak(newHead);
                     //setTimeout(gameLoop, FRAME_LENGTH); //do it all again
@@ -200,6 +202,10 @@
 					var tail = snak.splice(0,1)[0];
 					ctx.clearRect(tail.x, tail.y, BODY_SIZE, BODY_SIZE);
 				}
+
+                function clearRect(sq){
+                    ctx.clearRect(sq.x, sq.y, BODY_SIZE, BODY_SIZE);
+                }
 
 				function clearFood(food){
                     var idx = foods.indexOf(food);
@@ -252,10 +258,16 @@
 			$(document).ready(function () {
                 var socket = io();
 
-                socket.on('game_init', function(gameInfo){
+                socket.on('gameInit', function(gameInfo){
                     console.log(gameInfo.snake);
                     console.log(gameInfo.foods);
                     snakeGame.init(gameInfo.snake, gameInfo.foods);
+                });
+
+                socket.on('gameLoop', function(gameInfo){
+                    console.log(gameInfo.newHead);
+                    console.log(gameInfo.tail);
+
                 });
 
 				/*snakeGame.init();

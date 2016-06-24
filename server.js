@@ -105,26 +105,31 @@ function putNewHead(snak) {
     return newHead;
 }
 
+var snakes = {};
+
+function clearTail(snak){
+    var tail = snak.splice(0,1)[0];
+    return tail;
+}
+
 io.on('connection', function(socket){
     console.log('a user connected');
     var snake = snakeInit();
     var foods = foodInit();
 
-    io.emit('game_init', {snake : snake, foods : foods});
+    io.emit('gameInit', {snake : snake, foods : foods});
     console.log("스네이크 데이너 전송");
 
     socket.on('chat message', function(msg){
         console.log(msg);
         io.emit('msg', msg);
     });
-/*
-* setInterval(() => {
- putNewHead(snake);
- io.emit('game_info', )
- }, 500)
-*
-*
-* */
+
+    setInterval(() => {
+        putNewHead(snake);
+        io.emit('gameLoop', { newHead:putNewHead(snake), tail : clearTail(snake) })
+     }, 500);
+
 
 });
 
