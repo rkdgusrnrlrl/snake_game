@@ -267,7 +267,7 @@
                 socket.on('gameLoop', function(gameInfo){
                     console.log(gameInfo.newHead);
                     console.log(gameInfo.tail);
-
+                    snakeGame.gameLoop(gameInfo.newHead, gameInfo.tail);
                 });
 
 				/*snakeGame.init();

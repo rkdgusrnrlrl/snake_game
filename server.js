@@ -138,8 +138,11 @@ io.on('connection', function(socket){
     });
 
     setInterval(() => {
-        putNewHead(snake);
-        io.emit('gameLoop', { newHead:putNewHead(snake), tail : clearTail(snake) })
+        var head = putNewHead(snake);
+        var tail = clearTail(snake);
+        console.log("head :"+ head);
+        console.log("tail :"+ tail);
+        io.emit('gameLoop', { newHead: head, tail : tail })
      }, 500);
 
 
