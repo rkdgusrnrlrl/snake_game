@@ -16,6 +16,42 @@ gulp.task('pull', function(){
     });
 });
 
+function getLocalBranchs(stdout) {
+    var branchs = stdout.split("\n").map((branch) => branch.replace(/(^\s*)/g, ''));
+    return branchs;
+}
+gulp.task('default', function() {
+    git.exec({args : 'branch'}, function (err, stdout) {
+        var pushedBranch = argv.b || '';
+        if (pushedBranch !== '') {
+            var branchs = getLocalBranchs(stdout);
+            var currentBranch = getCurrentBranch(branchs);
+            console.log("현재 브랜치 : "+currentBranch);
+
+            //현재 브런치가 push 된 브런치랑 같은지 파악
+            if (pushedBranch !== currentBranch) {
+                if (isExist(branchs, pushedBranch)) {
+                    git.checkout(pushedBranch
+                        , {quiet : false}
+                        , (err) => errHandler(err) );
+                    console.log("체크아웃 끗");
+                } else {
+                    git.checkout("origin/"+pushedBranch
+                        , {args: '-t',quiet : false}
+                        , (err) => errHandler(err));
+                }
+            }
+            git.pull('origin', pushedBranch, {quiet : false}, (err) => errHandler(err))
+         } else {
+             console.log("브런치명을 넣어주세요");
+         }
+
+
+
+    });
+});
+
+
 gulp.task('runner', () => {
     var stream = nodemon({
         script : "bin/www",
