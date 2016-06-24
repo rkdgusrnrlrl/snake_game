@@ -111,8 +111,8 @@ function lastIdx(snak) {
 
 function putNewHead(snak) {
     var prevHead = snak[lastIdx(snak)];
-    var newHead = square(prevHead.x + direction.x
-        ,prevHead.y + direction.y);
+    var newHead = {     x :prevHead.x + direction.x
+                        , y :prevHead.y + direction.y };
     snak.push(newHead);
     return newHead;
 }
@@ -140,8 +140,6 @@ io.on('connection', function(socket){
     setInterval(() => {
         var head = putNewHead(snake);
         var tail = clearTail(snake);
-        console.log("head :"+ head);
-        console.log("tail :"+ tail);
         io.emit('gameLoop', { newHead: head, tail : tail })
      }, 500);
 
