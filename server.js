@@ -151,7 +151,7 @@ io.on('connection', function(socket){
                 console.log(snakes);
                 var snake = snakes[socketId];
                 console.log(snake);
-                var head = putNewHead(snake);
+                var head = putNewHead(snake.snake);
                 var tail = clearTail(snake);
                 io.emit('gameLoop', { newHead: head, tail : tail });
             });
