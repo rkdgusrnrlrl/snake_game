@@ -109,7 +109,7 @@
                 /**
 					컨버스를 만들고 context 를 현재 객체의 ctx 에 넘겨줌
 				*/
-				function init() {
+				function init(snak, foods) {
 					$('body').append('<canvas id="jsSnake">');
 					var $canvas = $('#jsSnake');
 					$canvas.attr('width', MAX_WIDTH);
@@ -129,7 +129,7 @@
                         drawSnak(foods[j]);
                     }
 
-					gameLoop();
+					//gameLoop();
 				}
 
                 var isWin = function () {
@@ -156,7 +156,7 @@
                     }
 
                     drawSnak(newHead);
-                    setTimeout(gameLoop, FRAME_LENGTH); //do it all again
+                    //setTimeout(gameLoop, FRAME_LENGTH); //do it all again
 				}
 
 				function drawSnak(snakBody){
@@ -247,6 +247,7 @@
 
 				return {
 					init : init,
+                    gameLoop : gameLoop,
 					moveHead : moveHead,
                     drawNewSnake : drawNewSnake
 				};
@@ -255,7 +256,13 @@
 			$(document).ready(function () {
                 var socket = io();
 
-				snakeGame.init();
+                socket.on('game_init', function(gameInfo){
+                    console.log(gameInfo.snake);
+                    console.log(gameInfo.foods);
+                    snakeGame.init(gameInfo.snake, gameInfo.foods);
+                });
+
+				/*snakeGame.init();
 
                 $("#sub").click(function () {
                     socket.emit('chat message', $('#m').val());
@@ -267,8 +274,8 @@
                     snakeGame.moveHead(msg);
                 });
 
-                socket.on('receive sq', function(sq){
-                    console.log(sq);
+                socket.on('game_info', function(head){
+                    gameLoop(head)
                 });
 
                 socket.on('drawNewSnake', function(snake){
@@ -280,7 +287,7 @@
                     socket.emit('chat message', event.keyCode);
                     console.log("key 값 전송");
         		});
-
+*/
 			});
             </script>
         </body>

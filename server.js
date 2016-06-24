@@ -11,9 +11,23 @@ app.get('/', function(req, res){
     res.sendfile('index.html');
 });
 
-var foods = []
+
+var snake = [];
+/*
+* 게임에 활용되는 상수
+* */
+
+var BODY_SIZE = 5;
+var MAX_WIDTH = 600;
+var MAX_HEIGHT = 600;
+
+var MAX_TAIL = 10;
+
+var FRAME_LENGTH = 100; //new frame every 0.5 seconds
+
 
 function foodInit() {
+    var foods = [];
     while (true) {
         var foodX = Math.floor(Math.random() * MAX_WIDTH);
         var foodY = Math.floor(Math.random() * MAX_HEIGHT);
@@ -23,6 +37,7 @@ function foodInit() {
             if (foods.length > BODY_SIZE) break;
         }
     }
+    return foods;
 }
 
 function snakeInit() {
@@ -82,19 +97,37 @@ function square (sq) {
     }
 }
 
+function putNewHead(snak) {
+    var prevHead = snak[lastIdx()];
+    var newHead = square(prevHead.x + direction.x
+        ,prevHead.y + direction.y);
+    snak.push(newHead);
+    return newHead;
+}
+
 io.on('connection', function(socket){
     console.log('a user connected');
-    io.emit('drawNewSnake', snakeInit());
+    var snake = snakeInit();
+    var foods = foodInit();
+
+    io.emit('game_init', {snake : snake, foods : foods});
     console.log("스네이크 데이너 전송");
 
     socket.on('chat message', function(msg){
         console.log(msg);
         io.emit('msg', msg);
     });
+/*
+* setInterval(() => {
+ putNewHead(snake);
+ io.emit('game_info', )
+ }, 500)
+*
+*
+* */
+
 });
 
 http.listen(3000, function(){
-
-
     console.log('listening on *:3000');
 });
