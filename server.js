@@ -158,12 +158,19 @@ io.on('connection', function(socket){
         isStart = true;
     }
 
-    /*socket.on('disconnect', function(){
-        var snake = snakes[this.id];
+    socket.on('disconnect', function(){
+        console.log(this.id);
+        removeVal(socketList, this.id);
+        delete snakes[this.id];
         io.emit('removeSnake', snake);
         console.log('user disconnected');
-    });*/
+    });
 });
+
+function removeVal(arr, val){
+    var idx = arr.indexOf(val);
+    arr.splice(idx,1)[0];
+}
 
 http.listen(3000, function(){
     console.log('listening on *:3000');
