@@ -172,8 +172,7 @@
                     return false;
                 }
 
-                function checkCrush() {
-                    var head = snak[lastIdx()];
+                function checkCrush(head) {
                     var x = head.x,
                         y = head.y;
 
@@ -266,6 +265,10 @@
                 socket.on('msg', function(msg){
                     console.log(msg);
                     snakeGame.moveHead(msg);
+                });
+
+                socket.on('receive sq', function(sq){
+                    console.log(sq);
                 });
 
                 socket.on('drawNewSnake', function(snake){

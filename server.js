@@ -11,6 +11,20 @@ app.get('/', function(req, res){
     res.sendfile('index.html');
 });
 
+var foods = []
+
+function foodInit() {
+    while (true) {
+        var foodX = Math.floor(Math.random() * MAX_WIDTH);
+        var foodY = Math.floor(Math.random() * MAX_HEIGHT);
+        var newFood =  square(foodX, foodY);
+        if (foods.indexOf(newFood) < 0) {
+            foods.push(newFood);
+            if (foods.length > BODY_SIZE) break;
+        }
+    }
+}
+
 function snakeInit() {
     var x = 0,
         y = 0,
@@ -25,6 +39,48 @@ function snakeInit() {
     return snak
 }
 
+function square (sq) {
+    return {
+        x : sq.x || 0,
+        y : sq.y || 0,
+        getXY : function () {
+            return {x : this.x, y : this.y};
+        },
+        isIn : function (other) {
+            //위로 갈때
+            if (((other.x <= this.x && this.x <= other.x + BODY_SIZE))
+                || (other.x <= this.x+BODY_SIZE && this.x+BODY_SIZE <= other.x +BODY_SIZE)){
+                if (other.y <= this.y && this.y <= other.y+BODY_SIZE) {
+                    return true;
+                }
+            }
+            //아래로 갈때
+            if ((other.x <= this.x && this.x <= other.x + BODY_SIZE)
+                || (other.x <= this.x+BODY_SIZE && this.x+BODY_SIZE <= other.x +BODY_SIZE)){
+                if (other.y <= this.y +BODY_SIZE && this.y+BODY_SIZE <= other.y+BODY_SIZE) {
+                    return true;
+                }
+            }
+
+            //오른쪽로 갈때
+            if ((other.y <= this.y && this.y <= other.y + BODY_SIZE)
+                || (other.y <= this.y+BODY_SIZE && this.y+BODY_SIZE <= other.y +BODY_SIZE)){
+                if (other.x <= this.x +BODY_SIZE && this.x+BODY_SIZE <= other.x+BODY_SIZE) {
+                    return true;
+                }
+            }
+
+            //왼쪽로 갈때
+            if ((other.y <= this.y && this.y <= other.y + BODY_SIZE)
+                || (other.y <= this.y+BODY_SIZE && this.y+BODY_SIZE <= other.y +BODY_SIZE)){
+                if (other.x <= this.x && this.x <= other.x+BODY_SIZE) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+}
 
 io.on('connection', function(socket){
     console.log('a user connected');
