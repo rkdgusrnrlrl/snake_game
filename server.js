@@ -25,6 +25,15 @@ var MAX_TAIL = 10;
 
 var FRAME_LENGTH = 100; //new frame every 0.5 seconds
 
+var UP = {x: 0, y : -BODY_SIZE};
+var DOWN = {x: 0, y : BODY_SIZE};
+var RIGHT = {y: 0, x : BODY_SIZE};
+var LIFT = {y: 0, x : -BODY_SIZE};
+
+var DIRECTION_ARRAY = [DOWN, RIGHT, UP, LIFT];
+
+var direction = RIGHT;
+
 
 function foodInit() {
     var foods = [];
