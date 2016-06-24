@@ -31,7 +31,7 @@ function foodInit() {
     while (true) {
         var foodX = Math.floor(Math.random() * MAX_WIDTH);
         var foodY = Math.floor(Math.random() * MAX_HEIGHT);
-        var newFood =  square(foodX, foodY);
+        var newFood =  {x:foodX, y:foodY};
         if (foods.indexOf(newFood) < 0) {
             foods.push(newFood);
             if (foods.length > BODY_SIZE) break;
