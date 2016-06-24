@@ -248,11 +248,18 @@
                     }
                 }
 
+                function removeSanke(snake) {
+                    snake.forEach(function (sq) {
+                        clearRect(sq);
+                    });
+                }
+
 				return {
 					init : init,
                     gameLoop : gameLoop,
 					moveHead : moveHead,
-                    drawNewSnake : drawNewSnake
+                    drawNewSnake : drawNewSnake,
+                    removeSanke : removeSanke
 				};
 			})();         
 
@@ -270,6 +277,11 @@
                     console.log(gameInfo.tail);
                     snakeGame.gameLoop(gameInfo.newHead, gameInfo.tail);
                 });
+
+               /* socket.on('removeSnake', function(snake){
+                    console.log("뱀 한마리를 삭제 합니다.");
+                    snakeGame.removeSanke(snake);
+                });*/
 
 				/*snakeGame.init();
 

@@ -123,11 +123,13 @@ function clearTail(snak){
     var tail = snak.splice(0,1)[0];
     return tail;
 }
-
+var isStart = false;
 io.on('connection', function(socket){
     console.log('a user connected');
     var snake = snakeInit();
     var foods = foodInit();
+
+    snakes[socket.id] = {snake : snake}
 
     io.emit('gameInit', {snake : snake, foods : foods});
     console.log("스네이크 데이너 전송");
@@ -137,13 +139,23 @@ io.on('connection', function(socket){
         io.emit('msg', msg);
     });
 
-    setInterval(() => {
-        var head = putNewHead(snake);
-        var tail = clearTail(snake);
-        io.emit('gameLoop', { newHead: head, tail : tail })
-     }, 500);
+    if (isStart) {
 
+    } else {
+        (function gameLoop () {
+            var head = putNewHead(snake);
+            var tail = clearTail(snake);
+            io.emit('gameLoop', { newHead: head, tail : tail });
+            setTimeout(gameLoop, 500);
+        })();
+        isStart = true;
+    }
 
+    /*socket.on('disconnect', function(){
+        var snake = snakes[this.id];
+        io.emit('removeSnake', snake);
+        console.log('user disconnected');
+    });*/
 });
 
 http.listen(3000, function(){
