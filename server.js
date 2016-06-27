@@ -110,6 +110,7 @@ function lastIdx(snak) {
 
 function putNewHead(snak) {
     var prevHead = snak.bodys[lastIdx(snak)];
+    console.log(prevHead);
     var newHead = {     x :prevHead.x + direction.x
                         , y :prevHead.y + direction.y };
     snak.bodys.push(newHead);
@@ -120,7 +121,7 @@ var snakes = {};
 var socketList = [];
 
 function clearTail(snak){
-    var tail = snak.splice(0,1)[0];
+    var tail = snak.bodys.splice(0,1)[0];
     return tail;
 }
 var isStart = false;
