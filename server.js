@@ -225,7 +225,8 @@ io.on('connection', function(socket){
     console.log("스네이크 데이너 전송");
 
     socket.on('move snake', function(msg){
-		var snake = snakes[socket.id];
+        console.log(msg);
+        var snake = snakes[socket.id];
 		moveHead(snake, msg);
     });
 
