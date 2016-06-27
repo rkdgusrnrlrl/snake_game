@@ -267,21 +267,17 @@
                 var socket = io();
 
                 socket.on('gameInit', function(gameInfo){
-                    console.log(gameInfo.snake);
-                    console.log(gameInfo.foods);
                     snakeGame.init(gameInfo.snake, gameInfo.foods);
                 });
 
                 socket.on('gameLoop', function(gameInfo){
-                    console.log(gameInfo.newHead);
-                    console.log(gameInfo.tail);
                     snakeGame.gameLoop(gameInfo.newHead, gameInfo.tail);
                 });
 
-               /* socket.on('removeSnake', function(snake){
+               socket.on('removeSnake', function(snake){
                     console.log("뱀 한마리를 삭제 합니다.");
                     snakeGame.removeSanke(snake);
-                });*/
+                });
 
 				/*snakeGame.init();
 
