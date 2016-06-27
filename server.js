@@ -74,9 +74,9 @@ function checkTwoY(y2, y) {
         || (y2 <= y + BODY_SIZE && y + BODY_SIZE <= y2 + BODY_SIZE);
 }
 
-function isCrushWall(snakeBody) {
-    var x = snakeBody.x,
-        y = snakeBody.y;
+function isCrushWall(head) {
+    var x = head.x,
+        y = head.y;
 
     if (x < 0 || x > MAX_WIDTH
         || y < 0 || y > MAX_HEIGHT) {
@@ -240,7 +240,8 @@ io.on('connection', function(socket){
                 var snake = snakes[socketId];
                 var head = putNewHead(snake);
                 var tail = clearTail(snake);
-                if (isCrushWall(snake.bodys)) {
+
+                if (isCrushWall(head)) {
                     snake.status = STATUS.CRUSHED;
                     io.emit('crushed', "LOST");
                 } else {
