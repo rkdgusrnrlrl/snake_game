@@ -247,7 +247,7 @@ io.on('connection', function(socket){
 
     socket.on('disconnect', function(){
         console.log(this.id);
-        removeVal(socketList, this.id);
+        removeVal(socketList, this);
         delete snakes[this.id];
         io.emit('removeSnake', snake.bodys);
         console.log('user disconnected');
