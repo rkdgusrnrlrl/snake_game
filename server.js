@@ -173,7 +173,7 @@ function moveIndex(direct, len) {
 }
 
 function printSocketList(){
-    cosole.log(socketList.map((socket) => { return socket.id }));
+    console.log(socketList.map((socket) => { return socket.id }));
 }
 
 
