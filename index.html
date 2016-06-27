@@ -279,6 +279,9 @@
                     snakeGame.removeSanke(snake);
                 });
 
+                $("body").keydown(function( event ) {
+                    socket.emit('move snake', event.keyCode);
+                });
 
 
 
@@ -303,10 +306,7 @@
                     snakeGame.drawNewSnake(snake);
                 });
 
-				$("body").keydown(function( event ) {
-                    socket.emit('chat message', event.keyCode);
-                    console.log("key 값 전송");
-        		});
+
 */
 			});
             </script>

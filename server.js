@@ -52,14 +52,13 @@ function foodInit() {
 function snakeInit() {
     var x = 0,
         y = 0,
-        snak = [];
+        snak = {drec: RIGHT, bodys : []};
 
     for (var i = 0; i < 5 ; i ++) {
-        snak.push({x:x,y:y});
+        snak.bodys.push({x:x,y:y});
         x += 5;
     }
 
-    console.log("스네이크 데이너 init");
     return snak
 }
 
@@ -110,10 +109,10 @@ function lastIdx(snak) {
 }
 
 function putNewHead(snak) {
-    var prevHead = snak[lastIdx(snak)];
+    var prevHead = snak.bodys[lastIdx(snak)];
     var newHead = {     x :prevHead.x + direction.x
                         , y :prevHead.y + direction.y };
-    snak.push(newHead);
+    snak.bodys.push(newHead);
     return newHead;
 }
 
@@ -133,12 +132,17 @@ io.on('connection', function(socket){
     snakes[socket.id] = {snake : snake}
     socketList.push(socket.id);
 
-    socket.emit('gameInit', {snake : snake, foods : foods});
+    socket.emit('gameInit', {snake : snake.bodys, foods : foods});
     console.log("스네이크 데이너 전송");
 
     socket.on('chat message', function(msg){
         console.log(msg);
         io.emit('msg', msg);
+    });
+
+
+    socket.on('move snake', function(msg){
+
     });
 
     if (isStart) {
