@@ -46,10 +46,16 @@ function foodInit() {
     return foods;
 }
 
+var STATUS = {
+    CRUSHED : "crushed",
+    IS_LIVE : "isLive",
+    IS_DEAD : "isDead"
+};
+
 function snakeInit() {
     var x = 0,
         y = 0,
-        snak = {drec: RIGHT, bodys : []};
+        snak = {drec: RIGHT, status : STATUS.IS_LIVE ,bodys : []};
 
     for (var i = 0; i < 5 ; i ++) {
         snak.bodys.push({x:x,y:y});
@@ -57,6 +63,62 @@ function snakeInit() {
     }
 
     return snak
+}
+
+function checkTwoX(x2, x) {
+    return (x2 <= x && x <= x2 + BODY_SIZE)
+        || (x2 <= x + BODY_SIZE && x + BODY_SIZE <= x2 + BODY_SIZE);
+}
+function checkTwoY(y2, y) {
+    return (y2 <= y && y <= y2 + BODY_SIZE)
+        || (y2 <= y + BODY_SIZE && y + BODY_SIZE <= y2 + BODY_SIZE);
+}
+
+function isCrushWall(snakeBody) {
+    var x = snakeBody.x,
+        y = snakeBody.y;
+
+    if (x < 0 || x > MAX_WIDTH
+        || y < 0 || y > MAX_HEIGHT) {
+        return true;
+    }
+    return false;
+}
+
+function isCrush(some, other) {
+    var x = some.x;
+    var y = some.y;
+
+    var x2 = other.x;
+    var y2 = other.y;
+
+    //위로 갈때
+    if (checkTwoX(x2, x)){
+        if (y2 <= y && y <= y2+BODY_SIZE) {
+            return true;
+        }
+    }
+    //아래로 갈때
+    if (checkTwoX(x2, x)){
+        if (y2 <= y +BODY_SIZE && y+BODY_SIZE <= y2+BODY_SIZE) {
+            return true;
+        }
+    }
+
+    //오른쪽로 갈때
+    if (checkTwoY(y2, y)){
+        if (x2 <= x +BODY_SIZE && x+BODY_SIZE <= x2+BODY_SIZE) {
+            return true;
+        }
+    }
+
+    //왼쪽로 갈때
+    if (checkTwoY(y2, y)){
+        if (x2 <= x && x <= x2+BODY_SIZE) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function square (sq) {
@@ -177,7 +239,12 @@ io.on('connection', function(socket){
                 var snake = snakes[socketId];
                 var head = putNewHead(snake);
                 var tail = clearTail(snake);
-                io.emit('gameLoop', { newHead: head, tail : tail });
+                if (isCrushWall(snake.bodys)) {
+                    snake.status = STATUS.CRUSHED;
+                    io.emit('crushed', "LOST");
+                } else {
+                    io.emit('gameLoop', { newHead: head, tail : tail });
+                }
             });
             setTimeout(gameLoop, 500);
         })();

@@ -277,6 +277,11 @@
                socket.on('removeSnake', function(snake){
                     console.log("뱀 한마리를 삭제 합니다.");
                     snakeGame.removeSanke(snake);
+                });ㅊ
+
+               socket.on('crushed', function(snake){
+                    console.log("뱀 벽에 부딪혔습니다.");
+                    alert("LOST GAME");
                 });
 
                 $("body").keydown(function( event ) {
