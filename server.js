@@ -258,7 +258,7 @@ io.on('connection', function(socket){
                             snake.status = STATUS.CRUSHED;
                             socket.emit('crushed', "LOST");
                         } else {
-                            io.to.('gaming').emit('gameLoop', { newHead: head, tail : tail });
+                            io.to('gaming').emit('gameLoop', { newHead: head, tail : tail });
                         }
                 }
             });
