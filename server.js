@@ -179,6 +179,8 @@ function putNewHead(snak) {
 
 var snakes = {};
 var socketList = [];
+var sockets = {};
+
 
 function clearTail(snak){
     var tail = snak.bodys.splice(0,1)[0];
@@ -219,7 +221,10 @@ io.on('connection', function(socket){
     var snake = snakeInit();
     var foods = foodInit();
     snakes[socket.id] = snake
-    socketList.push(socket.id);
+    socketList.push(socket);
+
+    socket.join('gaming');
+
 
     socket.emit('gameInit', {snake : snake.bodys, foods : foods});
     console.log("스네이크 데이너 전송");
@@ -235,17 +240,26 @@ io.on('connection', function(socket){
     } else {
         (function gameLoop () {
             //소켓 리스트에서 아이디를 꺼낸뒤 그 아이디로 해당 뱀을 꺼내줌
-            socketList.forEach(function (socketId){
+            socketList.forEach(function (socket){
 				console.log(socketList);
-                var snake = snakes[socketId];
+                var snake = snakes[socket.id];
                 var head = putNewHead(snake);
                 var tail = clearTail(snake);
-
-                if (isCrushWall(head)) {
-                    snake.status = STATUS.CRUSHED;
-                    io.emit('crushed', "LOST");
-                } else {
-                    io.emit('gameLoop', { newHead: head, tail : tail });
+                switch (snake.status) {
+                    case STATUS.CRUSHED:
+                        snake.status = STATUS.IS_DEAD;
+                        console.log(socket.id+"가 죽었습니다.");
+                        socket.leave('gaming');
+                        break;
+                    case STATUS.IS_DEAD:
+                        break;
+                    default:
+                        if (isCrushWall(head)) {
+                            snake.status = STATUS.CRUSHED;
+                            socket.emit('crushed', "LOST");
+                        } else {
+                            io.to.('gaming').emit('gameLoop', { newHead: head, tail : tail });
+                        }
                 }
             });
             setTimeout(gameLoop, 500);
