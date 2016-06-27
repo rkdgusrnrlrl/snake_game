@@ -32,9 +32,6 @@ var LIFT = {y: 0, x : -BODY_SIZE};
 
 var DIRECTION_ARRAY = [DOWN, RIGHT, UP, LIFT];
 
-var direction = RIGHT;
-
-
 function foodInit() {
     var foods = [];
     while (true) {
@@ -109,11 +106,12 @@ function lastIdx(snak) {
 }
 
 function putNewHead(snak) {
-    var prevHead = snak.bodys[lastIdx(snak)];
-    console.log(prevHead);
-    var newHead = {     x :prevHead.x + direction.x
-                        , y :prevHead.y + direction.y };
-    snak.bodys.push(newHead);
+    var snakeBodys = snak.bodys;
+	var drec = snak.drec;
+    var prevHead = snakeBodys[lastIdx(snakeBodys)];
+    var newHead = {     x :prevHead.x + drec.x
+                        , y :prevHead.y + drec.y };
+    snakeBodys.push(newHead);
     return newHead;
 }
 
@@ -124,26 +122,49 @@ function clearTail(snak){
     var tail = snak.bodys.splice(0,1)[0];
     return tail;
 }
+
+function moveHead(snake, key) {
+	var way;
+	switch (key) {
+		case 39:
+			way = -1;
+			break;
+		case 37:
+			way = 1;
+			break;
+		default:
+			return;
+	}
+	var idx = DIRECTION_ARRAY.indexOf(snake.drec);
+	
+	var newIdex = moveIndex(idx + way, DIRECTION_ARRAY.length);
+	snake['drec'] = DIRECTION_ARRAY[newIdex];
+}
+
+function moveIndex(direct, len) {
+	var val = direct % len;
+	if (val <0 ) {
+		val = len + val;
+	}
+	return val;
+}
+
+
+
 var isStart = false;
 io.on('connection', function(socket){
     console.log('a user connected');
     var snake = snakeInit();
     var foods = foodInit();
-    console.log(socket.id)
-    snakes[socket.id] = {snake : snake}
+    snakes[socket.id] = snake
     socketList.push(socket.id);
 
     socket.emit('gameInit', {snake : snake.bodys, foods : foods});
     console.log("스네이크 데이너 전송");
 
-    socket.on('chat message', function(msg){
-        console.log(msg);
-        io.emit('msg', msg);
-    });
-
-
     socket.on('move snake', function(msg){
-
+		var snake = snakes[socket.id];
+		moveHead(snake, msg);
     });
 
     if (isStart) {
@@ -152,9 +173,8 @@ io.on('connection', function(socket){
         (function gameLoop () {
             //소켓 리스트에서 아이디를 꺼낸뒤 그 아이디로 해당 뱀을 꺼내줌
             socketList.forEach(function (socketId){
-                console.log(socketList);
-                var snake = snakes[socketId].snake;
-                console.log("gameLoop snake : "+JSON.stringify(snake));
+				console.log(socketList);
+                var snake = snakes[socketId];
                 var head = putNewHead(snake);
                 var tail = clearTail(snake);
                 io.emit('gameLoop', { newHead: head, tail : tail });
@@ -168,7 +188,7 @@ io.on('connection', function(socket){
         console.log(this.id);
         removeVal(socketList, this.id);
         delete snakes[this.id];
-        io.emit('removeSnake', snake);
+        io.emit('removeSnake', snake.bodys);
         console.log('user disconnected');
     });
 });
