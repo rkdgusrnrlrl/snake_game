@@ -224,7 +224,7 @@ io.on('connection', function(socket){
                         } else {
                             var isFine = socketList.every(function (_socket) {
                                 if (socket.id !== _socket.id) {
-                                    let _snake = snakes[_socket.id];
+                                    var _snake = snakes[_socket.id];
                                     return _snake.bodys.every(isCrushThan)
                                 }
                                 return true;
