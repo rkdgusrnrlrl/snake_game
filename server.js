@@ -154,6 +154,7 @@ io.on('connection', function(socket){
             socketList.forEach(function (socketId){
                 console.log(socketList);
                 var snake = snakes[socketId].snake;
+                console.log("gameLoop snake : "+snake);
                 var head = putNewHead(snake);
                 var tail = clearTail(snake);
                 io.emit('gameLoop', { newHead: head, tail : tail });
