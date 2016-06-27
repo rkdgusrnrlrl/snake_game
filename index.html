@@ -271,6 +271,7 @@
                 });
 
                 socket.on('gameLoop', function(gameInfo){
+                    console.log("게임이 진행중입니다.");
                     snakeGame.gameLoop(gameInfo.newHead, gameInfo.tail);
                 });
 
