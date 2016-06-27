@@ -84,85 +84,44 @@ function isCrushWall(head) {
     }
     return false;
 }
+function getFnIsNotCrush(some) {
+    return function isCrush(other) {
+        var x = some.x;
+        var y = some.y;
 
-function isCrush(some, other) {
-    var x = some.x;
-    var y = some.y;
+        var x2 = other.x;
+        var y2 = other.y;
 
-    var x2 = other.x;
-    var y2 = other.y;
-
-    //위로 갈때
-    if (checkTwoX(x2, x)){
-        if (y2 <= y && y <= y2+BODY_SIZE) {
-            return true;
+        //위로 갈때
+        if (checkTwoX(x2, x)){
+            if (y2 <= y && y <= y2+BODY_SIZE) {
+                return false;
+            }
         }
-    }
-    //아래로 갈때
-    if (checkTwoX(x2, x)){
-        if (y2 <= y +BODY_SIZE && y+BODY_SIZE <= y2+BODY_SIZE) {
-            return true;
+        //아래로 갈때
+        if (checkTwoX(x2, x)){
+            if (y2 <= y +BODY_SIZE && y+BODY_SIZE <= y2+BODY_SIZE) {
+                return false;
+            }
         }
-    }
 
-    //오른쪽로 갈때
-    if (checkTwoY(y2, y)){
-        if (x2 <= x +BODY_SIZE && x+BODY_SIZE <= x2+BODY_SIZE) {
-            return true;
+        //오른쪽로 갈때
+        if (checkTwoY(y2, y)){
+            if (x2 <= x +BODY_SIZE && x+BODY_SIZE <= x2+BODY_SIZE) {
+                return false;
+            }
         }
-    }
 
-    //왼쪽로 갈때
-    if (checkTwoY(y2, y)){
-        if (x2 <= x && x <= x2+BODY_SIZE) {
-            return true;
+        //왼쪽로 갈때
+        if (checkTwoY(y2, y)){
+            if (x2 <= x && x <= x2+BODY_SIZE) {
+                return false;
+            }
         }
+        return true;
     }
-    return false;
 }
 
-function square (sq) {
-    return {
-        x : sq.x || 0,
-        y : sq.y || 0,
-        getXY : function () {
-            return {x : this.x, y : this.y};
-        },
-        isIn : function (other) {
-            //위로 갈때
-            if (((other.x <= this.x && this.x <= other.x + BODY_SIZE))
-                || (other.x <= this.x+BODY_SIZE && this.x+BODY_SIZE <= other.x +BODY_SIZE)){
-                if (other.y <= this.y && this.y <= other.y+BODY_SIZE) {
-                    return true;
-                }
-            }
-            //아래로 갈때
-            if ((other.x <= this.x && this.x <= other.x + BODY_SIZE)
-                || (other.x <= this.x+BODY_SIZE && this.x+BODY_SIZE <= other.x +BODY_SIZE)){
-                if (other.y <= this.y +BODY_SIZE && this.y+BODY_SIZE <= other.y+BODY_SIZE) {
-                    return true;
-                }
-            }
-
-            //오른쪽로 갈때
-            if ((other.y <= this.y && this.y <= other.y + BODY_SIZE)
-                || (other.y <= this.y+BODY_SIZE && this.y+BODY_SIZE <= other.y +BODY_SIZE)){
-                if (other.x <= this.x +BODY_SIZE && this.x+BODY_SIZE <= other.x+BODY_SIZE) {
-                    return true;
-                }
-            }
-
-            //왼쪽로 갈때
-            if ((other.y <= this.y && this.y <= other.y + BODY_SIZE)
-                || (other.y <= this.y+BODY_SIZE && this.y+BODY_SIZE <= other.y +BODY_SIZE)){
-                if (other.x <= this.x && this.x <= other.x+BODY_SIZE) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-}
 function lastIdx(snak) {
     return snak.length-1;
 }
@@ -213,6 +172,10 @@ function moveIndex(direct, len) {
 	return val;
 }
 
+function printSocketList(){
+    cosole.log(socketList.map((socket) => { return socket.id }));
+}
+
 
 
 var isStart = false;
@@ -223,9 +186,8 @@ io.on('connection', function(socket){
     snakes[socket.id] = snake
     socketList.push(socket);
 
+    printSocketList();
     socket.join('gaming');
-
-
     socket.emit('gameInit', {snake : snake.bodys, foods : foods});
     console.log("스네이크 데이너 전송");
 
@@ -241,7 +203,6 @@ io.on('connection', function(socket){
         (function gameLoop () {
             //소켓 리스트에서 아이디를 꺼낸뒤 그 아이디로 해당 뱀을 꺼내줌
             socketList.forEach(function (socket){
-				console.log(socketList);
                 var snake = snakes[socket.id];
                 var head = putNewHead(snake);
                 var tail = clearTail(snake);
@@ -254,11 +215,27 @@ io.on('connection', function(socket){
                     case STATUS.IS_DEAD:
                         break;
                     default:
+                        var isCrushThan = getFnIsNotCrush(head);
+
+
                         if (isCrushWall(head)) {
                             snake.status = STATUS.CRUSHED;
                             socket.emit('crushed', "LOST");
                         } else {
-                            io.to('gaming').emit('gameLoop', { newHead: head, tail : tail });
+                            var isFine = socketList.every(function (_socket) {
+                                if (socket.id !== _socket.id) {
+                                    let _snake = snakes[_socket.id];
+                                    return _snake.bodys.every(isCrushThan)
+                                }
+                                return true;
+                            });
+
+                            if (isFine) {
+                                io.to('gaming').emit('gameLoop', { newHead: head, tail : tail });
+                            } else {
+                                snake.status = STATUS.CRUSHED;
+                                socket.emit('crushed', "LOST");
+                            }
                         }
                 }
             });
